@@ -38,10 +38,10 @@ def main():
     print("Example output:", example.is_safe)
 
     pred = safety_classify(user_query=example.user_query)
-    print('*' * 50)
-    print("Predicted output:", pred)
-    dspy.inspect_history(n=1)
-    print('*' * 50)
+    # print('*' * 50)
+    # print("Predicted output:", pred)
+    # dspy.inspect_history(n=1)
+    # print('*' * 50)
 
     # is_valid = validate_result(example, predicted_example)
     # print("Validation result:", is_valid)
@@ -49,7 +49,7 @@ def main():
     evaluator = dspy.Evaluate(devset=training_examples, num_threads=15)
     evaluator(safety_classify, metric=validate_result)
 
-    opt_training_examples = training_examples
+    opt_training_examples = training_examples[:]
     # for e in training_examples:
     #     print(f"train example: {e.user_query} => {e.is_safe}")
 
