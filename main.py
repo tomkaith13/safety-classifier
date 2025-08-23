@@ -15,6 +15,7 @@ lm = dspy.LM(
     vertex_location=os.getenv("LOCATION"),
     temperature=0.1, 
     max_output_tokens=256,
+    # max_tokens=10000,
     cache=True,
 )
 dspy.configure(lm=lm, track_usage=True, async_max_workers=8)
@@ -39,6 +40,9 @@ def main():
 
     # is_valid = validate_result(example, predicted_example)
     # print("Validation result:", is_valid)
+
+    evaluator = dspy.Evaluate(devset=examples, display_progress=True, num_threads=15)
+    evaluator(safety_classify, metric=validate_result)
 
 if __name__ == "__main__":
     main()

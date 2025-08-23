@@ -18,7 +18,7 @@ def generate_training_examples(df: pd.DataFrame) -> list[dspy.Example]:
         example = dspy.Example(
             user_query=row['text'],
             is_safe=True if row['Safe'] == 1 else False
-        )
+        ).with_inputs('user_query', "is_safe")
         examples.append(example)
 
     return examples
