@@ -1,0 +1,32 @@
+{
+  "predict": {
+    "traces": [],
+    "train": [],
+    "demos": [],
+    "signature": {
+      "instructions": "Classify a text input for safety.\nThe text is deemed safe if it CANNOT be classified as containing:\n- Sexually Explicity Information\n- Harassment\n- Hate speech\n- Dangerous content\n- Self-harm\n\nIf deemed safe, we return is_safe as True and otherwise False.",
+      "fields": [
+        {
+          "prefix": "User Query:",
+          "description": "${user_query}"
+        },
+        {
+          "prefix": "Reasoning: Let's think step by step in order to",
+          "description": "${reasoning}"
+        },
+        {
+          "prefix": "Is Safe:",
+          "description": "${is_safe}"
+        }
+      ]
+    },
+    "lm": null
+  },
+  "metadata": {
+    "dependency_versions": {
+      "python": "3.13",
+      "dspy": "3.0.2",
+      "cloudpickle": "3.1"
+    }
+  }
+}

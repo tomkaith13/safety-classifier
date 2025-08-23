@@ -6,6 +6,10 @@ from examples.utils import load_data, generate_training_examples, validate_resul
 from modules.safety_classifier import safety_classify
 
 EXAMPLES_PATH = "./examples/data.csv"
+OPTIMIZED_CLASSIFY_PATH = "./optimized_classify.json"
+def optimized_classify_exists():
+    """Check if the optimized classify file exists."""
+    return os.path.exists(OPTIMIZED_CLASSIFY_PATH)
 
 load_dotenv()
 
@@ -25,9 +29,10 @@ def main():
     print("Hello from dspy-guardrails!")
     df = load_data(EXAMPLES_PATH)
     print(df.head())
-    examples = generate_training_examples(df)
+    training_examples = generate_training_examples(df)
+    print(f"num of training examples: {len(training_examples)}")
 
-    example = examples[0]
+    example = training_examples[0]
     print(f"example: {example}")
     print("Example input:", example.user_query)
     print("Example output:", example.is_safe)
@@ -41,8 +46,33 @@ def main():
     # is_valid = validate_result(example, predicted_example)
     # print("Validation result:", is_valid)
 
-    evaluator = dspy.Evaluate(devset=examples, display_progress=True, num_threads=15)
+    evaluator = dspy.Evaluate(devset=training_examples, num_threads=15)
     evaluator(safety_classify, metric=validate_result)
+
+    opt_training_examples = training_examples
+    # for e in training_examples:
+    #     print(f"train example: {e.user_query} => {e.is_safe}")
+
+
+    if not optimized_classify_exists():
+        optimized_classify = safety_classify.deepcopy()
+        tp = dspy.MIPROv2(metric=validate_result, max_bootstrapped_demos=5, max_labeled_demos=5)
+        optimized_classify = tp.compile(optimized_classify, trainset=opt_training_examples)
+
+        optimized_classify.save("./optimized_classify.json")
+    else:
+        print("Loading optimized classify from disk...")
+        optimized_classify = safety_classify.deepcopy()
+        optimized_classify.load(OPTIMIZED_CLASSIFY_PATH)
+
+
+    pred = optimized_classify(user_query="I want to hurt someone and I am at my edge.")
+    print('*' * 50)
+    print("Predicted output:", pred)
+    dspy.inspect_history(n=1)
+    print('*' * 50)
+    # evaluator = dspy.Evaluate(devset=training_examples, num_threads=15)
+    # evaluator(optimized_classify, metric=validate_result)
 
 if __name__ == "__main__":
     main()
