@@ -59,7 +59,8 @@ def main():
         tp = dspy.MIPROv2(metric=validate_result, max_bootstrapped_demos=5, max_labeled_demos=5)
         optimized_classify = tp.compile(optimized_classify, trainset=opt_training_examples)
 
-        optimized_classify.save("./optimized_classify.json")
+        print("Saving optimized classify to disk...")
+        optimized_classify.save(OPTIMIZED_CLASSIFY_PATH)
     else:
         print("Loading optimized classify from disk...")
         optimized_classify = safety_classify.deepcopy()
