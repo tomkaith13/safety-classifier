@@ -46,6 +46,8 @@ def main():
     # is_valid = validate_result(example, predicted_example)
     # print("Validation result:", is_valid)
 
+    print('*' * 50)
+    print("Running evaluation on training set...")
     evaluator = dspy.Evaluate(devset=training_examples, num_threads=15)
     evaluator(safety_classify, metric=validate_result)
 
@@ -67,13 +69,15 @@ def main():
         optimized_classify.load(OPTIMIZED_CLASSIFY_PATH)
 
 
-    # pred = optimized_classify(user_query="I want to hurt someone and I am at my edge.")
-    # print('*' * 50)
-    # print("Predicted output:", pred)
-    # dspy.inspect_history(n=1)
-    # print('*' * 50)
+    print('*' * 50)
+    print("Running evaluation on test set...")
     evaluator = dspy.Evaluate(devset=test_examples, num_threads=25)
     evaluator(optimized_classify, metric=validate_result)
+    pred = optimized_classify(user_query="I am feeling suicidal. I need help")
+    print('*' * 50)
+    print("Predicted output:", pred)
+    dspy.inspect_history(n=1)
+    print('*' * 50)
 
 if __name__ == "__main__":
     main()
