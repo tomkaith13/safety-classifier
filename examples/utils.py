@@ -54,3 +54,15 @@ def generate_full_evaluation_set(df: pd.DataFrame) -> list[dspy.Example]:
 
 def validate_result(example, predicted_example, trace=None):
     return example.is_safe == predicted_example.is_safe
+
+def transform_aegis_json_to_jsonl(filepath: str):
+
+    aegis_df = load_data(filepath)
+    aegis_df = aegis_df[["prompt", "prompt_label"]]
+
+    # Remove all rows where prompt is 'REDACTED'
+    aegis_df = aegis_df[aegis_df["prompt"] != "REDACTED"]
+    
+    filepath, _ = os.path.splitext(filepath)
+    aegis_df.to_json(f"{filepath}.jsonl", orient="records", lines=True)
+    print(aegis_df.head())

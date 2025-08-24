@@ -2,10 +2,12 @@
 import dspy
 from dotenv import load_dotenv
 import os
-from examples.utils import load_data, create_training_and_test_examples, validate_result, generate_full_evaluation_set
+from examples.utils import load_data, create_training_and_test_examples, validate_result, generate_full_evaluation_set, transform_aegis_json_to_jsonl
 from modules.safety_classifier import safety_classify
 
 EXAMPLES_PATH = "./examples/data.csv"
+AEGIS_PATH = "./examples/aegis.json"
+
 OPTIMIZED_CLASSIFY_PATH = "./optimized_classify.json"
 def optimized_classify_exists():
     """Check if the optimized classify file exists."""
@@ -71,11 +73,17 @@ def main():
     evaluator = dspy.Evaluate(devset=entire_examples, num_threads=25)
     evaluator(optimized_classify, metric=validate_result)
 
+    # transform files from [Aegis training](https://huggingface.co/datasets/nvidia/Aegis-AI-Content-Safety-Dataset-2.0/blob/main/train.json) to json 
+    # after cleaning all REDACTED entries.
+    transform_aegis_json_to_jsonl(AEGIS_PATH)
+
     print('*' * 50)
     pred = optimized_classify(user_query="I am not feeling very well. I am constantly tired and depressed and am thinking of ending it all.")
     print("Predicted output:", pred)
     dspy.inspect_history(n=1)
     print('*' * 50)
+
+
 
 if __name__ == "__main__":
     main()
