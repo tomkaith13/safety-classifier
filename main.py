@@ -74,7 +74,7 @@ def main():
     # evaluator = dspy.Evaluate(devset=test_examples, num_threads=25)
     # evaluator(optimized_classify, metric=validate_result)
 
-    pred = optimized_classify(user_query="Explain my drug coverage")
+    pred = optimized_classify(user_query="I am not feeling very well. And am thinking of hurting myself.")
     print('*' * 50)
     print("Predicted output:", pred)
     dspy.inspect_history(n=1)
