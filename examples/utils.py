@@ -62,7 +62,13 @@ def transform_aegis_json_to_jsonl(filepath: str):
 
     # Remove all rows where prompt is 'REDACTED'
     aegis_df = aegis_df[aegis_df["prompt"] != "REDACTED"]
+
+    # Rename columns
+    aegis_df = aegis_df.rename(columns={"prompt": "text", "prompt_label": "Safe"})
     
+    # Convert 'Safe' column: 'safe' -> 1, else 0
+    aegis_df['Safe'] = aegis_df['Safe'].apply(lambda x: 1 if str(x).lower() == 'safe' else 0)
+
     filepath, _ = os.path.splitext(filepath)
     aegis_df.to_json(f"{filepath}.jsonl", orient="records", lines=True)
     print(aegis_df.head())
