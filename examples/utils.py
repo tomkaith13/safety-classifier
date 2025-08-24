@@ -13,6 +13,9 @@ def load_data(file_path: str) -> pd.DataFrame:
     elif ext == ".json":
         df = pd.read_json(file_path)
         return df
+    elif ext == ".jsonl":
+        df = pd.read_json(file_path, lines=True)
+        return df
     
     return None
 

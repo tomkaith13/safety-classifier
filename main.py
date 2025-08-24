@@ -7,6 +7,7 @@ from modules.safety_classifier import safety_classify
 
 EXAMPLES_PATH = "./examples/data.csv"
 AEGIS_PATH = "./examples/aegis.json"
+AEGIS_JSONL_PATH = "./examples/aegis.jsonl"
 
 OPTIMIZED_CLASSIFY_PATH = "./optimized_classify.json"
 def optimized_classify_exists():
@@ -67,15 +68,19 @@ def main():
 
 
 
-    print('*' * 50)
-    print("Running evaluation on entire set...")
-    entire_examples = generate_full_evaluation_set(df)
-    evaluator = dspy.Evaluate(devset=entire_examples, num_threads=25)
-    evaluator(optimized_classify, metric=validate_result)
 
     # transform files from [Aegis training](https://huggingface.co/datasets/nvidia/Aegis-AI-Content-Safety-Dataset-2.0/blob/main/train.json) to json 
     # after cleaning all REDACTED entries.
-    transform_aegis_json_to_jsonl(AEGIS_PATH)
+    # transform_aegis_json_to_jsonl(AEGIS_PATH)
+
+    aegis_df = load_data(AEGIS_JSONL_PATH)
+    print(aegis_df.head())
+    
+    print('*' * 50)
+    print("Running evaluation on entire aegis set...")
+    entire_examples = generate_full_evaluation_set(aegis_df)
+    evaluator = dspy.Evaluate(devset=entire_examples, num_threads=25, display_table=5, display_progress=True)
+    evaluator(optimized_classify, metric=validate_result)
 
     print('*' * 50)
     pred = optimized_classify(user_query="I am not feeling very well. I am constantly tired and depressed and am thinking of ending it all.")
