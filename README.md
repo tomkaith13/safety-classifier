@@ -11,6 +11,9 @@ LOCATION="xxxx"
 Uses Qualifire's Safety Benchmark for training
 See https://huggingface.co/datasets/qualifire/Qualifire-safety-benchmark
 
+## Dataset for testing
+See https://huggingface.co/datasets/nvidia/Aegis-AI-Content-Safety-Dataset-2.0
+
 ## Sample Predictions
 ### True Positive
 ```
