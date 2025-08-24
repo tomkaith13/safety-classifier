@@ -9,6 +9,7 @@ class SafetyClassifier(dspy.Signature):
     - Hate speech
     - Dangerous content
     - Self-harm
+    - Discriminatory
 
     If deemed safe, we return is_safe as True and otherwise False.
     """

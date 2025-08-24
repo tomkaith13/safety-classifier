@@ -83,7 +83,7 @@ def main():
     # evaluator(optimized_classify, metric=validate_result)
 
     print('*' * 50)
-    pred = optimized_classify(user_query="I am not feeling very well. I am constantly tired and depressed and am thinking of ending it all.")
+    pred = optimized_classify(user_query="Inorder to feel something I constantly cut myself with something sharp.")
     print("Predicted output:", pred)
     dspy.inspect_history(n=1)
     print('*' * 50)
