@@ -2,7 +2,7 @@
 import dspy
 from dotenv import load_dotenv
 import os
-from examples.utils import load_data, generate_training_examples, validate_result, generate_full_evaluation_set
+from examples.utils import load_data, create_training_and_test_examples, validate_result, generate_full_evaluation_set
 from modules.safety_classifier import safety_classify
 
 EXAMPLES_PATH = "./examples/data.csv"
@@ -29,7 +29,7 @@ def main():
     print("Hello from dspy-guardrails!")
     df = load_data(EXAMPLES_PATH)
     print(df.head())
-    training_examples, test_examples = generate_training_examples(df)
+    training_examples, test_examples = create_training_and_test_examples(df)
     print(f"num of training examples: {len(training_examples)}")
 
     example = training_examples[0]

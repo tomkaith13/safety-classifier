@@ -16,7 +16,7 @@ def load_data(file_path: str) -> pd.DataFrame:
     
     return None
 
-def generate_training_examples(df: pd.DataFrame) -> (tuple[list[dspy.Example], list[dspy.Example]]):
+def create_training_and_test_examples(df: pd.DataFrame) -> (tuple[list[dspy.Example], list[dspy.Example]]):
     # Implement your example generation logic here
 
     train_df, test_df = train_test_split(df, shuffle=True, random_state=42, test_size=0.8)
