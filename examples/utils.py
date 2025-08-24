@@ -31,5 +31,17 @@ def generate_training_examples(df: pd.DataFrame) -> (tuple[list[dspy.Example], l
 
     return examples, test_examples
 
+def generate_full_evaluation_set(df: pd.DataFrame) -> list[dspy.Example]:
+    examples = []
+
+    for _, row in df.iterrows():
+        example = dspy.Example(
+            user_query=row['text'],
+            is_safe=True if row['Safe'] == 1 else False
+        ).with_inputs("user_query")
+        examples.append(example)
+        
+    return examples
+
 def validate_result(example, predicted_example, trace=None):
     return example.is_safe == predicted_example.is_safe
