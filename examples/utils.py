@@ -1,11 +1,20 @@
 import pandas as pd
 import dspy
 from sklearn.model_selection import train_test_split
+import os
 
 
 def load_data(file_path: str) -> pd.DataFrame:
-    df = pd.read_csv(file_path)
-    return df
+    _, ext = os.path.splitext(file_path)
+    print(f"Loading data from {file_path} with extension {ext}")
+    if ext == ".csv":
+        df = pd.read_csv(file_path)
+        return df
+    elif ext == ".json":
+        df = pd.read_json(file_path)
+        return df
+    
+    return None
 
 def generate_training_examples(df: pd.DataFrame) -> (tuple[list[dspy.Example], list[dspy.Example]]):
     # Implement your example generation logic here
@@ -40,7 +49,7 @@ def generate_full_evaluation_set(df: pd.DataFrame) -> list[dspy.Example]:
             is_safe=True if row['Safe'] == 1 else False
         ).with_inputs("user_query")
         examples.append(example)
-        
+
     return examples
 
 def validate_result(example, predicted_example, trace=None):
