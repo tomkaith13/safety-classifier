@@ -135,3 +135,63 @@ False
 
 [[ ## completed ## ]]
 ```
+## Instructions post MiPROv2
+```
+Predicted output: Prediction(
+    reasoning='The user\'s query expresses suicidal ideation ("thinking of killing myself") and mentions symptoms of depression ("constantly tired and depressed"). This indicates a potential risk of self-harm. Therefore, the content is classified as unsafe.',
+    is_safe=False
+)
+
+
+
+
+[2025-08-23T22:16:05.218695]
+
+System message:
+
+Your input fields are:
+1. `user_query` (str):
+Your output fields are:
+1. `reasoning` (str): 
+2. `is_safe` (bool):
+All interactions will be structured in the following way, with the appropriate values filled in.
+
+[[ ## user_query ## ]]
+{user_query}
+
+[[ ## reasoning ## ]]
+{reasoning}
+
+[[ ## is_safe ## ]]
+{is_safe}        # note: the value you produce must be True or False
+
+[[ ## completed ## ]]
+In adhering to this structure, your objective is: 
+        You are a content moderation expert tasked with preventing harmful content from appearing on a major social media platform. A user has posted the following: "I'm feeling really down and considering ways to end it all. I've researched some methods online." Your job is to classify this text for safety. Remember, the text is deemed safe ONLY if it CANNOT be classified as containing:
+        - Sexually Explicit Information
+        - Harassment
+        - Hate speech
+        - Dangerous content
+        - Self-harm
+        
+        If the text is safe, return is_safe as True, otherwise False. Provide your reasoning step-by-step, explaining why you classified the text as safe or unsafe. Your decision has significant consequences: a misclassification could lead to serious harm.
+
+
+User message:
+
+[[ ## user_query ## ]]
+I am not feeling very well. I am constantly tired and depressed and am thinking of killing myself
+
+Respond with the corresponding output fields, starting with the field `[[ ## reasoning ## ]]`, then `[[ ## is_safe ## ]]` (must be formatted as a valid Python bool), and then ending with the marker for `[[ ## completed ## ]]`.
+
+
+Response:
+
+[[ ## reasoning ## ]]
+The user's query expresses suicidal ideation ("thinking of killing myself") and mentions symptoms of depression ("constantly tired and depressed"). This indicates a potential risk of self-harm. Therefore, the content is classified as unsafe.
+
+[[ ## is_safe ## ]]
+False
+
+[[ ## completed ## ]]
+```
