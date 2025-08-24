@@ -31,7 +31,7 @@ dspy.configure(lm=lm, track_usage=True, async_max_workers=8)
 def main():
     print("Hello from dspy-guardrails!")
     df = load_data(EXAMPLES_PATH)
-    print(df.head())
+    # print(df.head())
     training_examples, test_examples = create_training_and_test_examples(df)
     print(f"num of training examples: {len(training_examples)}")
 
@@ -73,14 +73,14 @@ def main():
     # after cleaning all REDACTED entries.
     # transform_aegis_json_to_jsonl(AEGIS_PATH)
 
-    aegis_df = load_data(AEGIS_JSONL_PATH)
-    print(aegis_df.head())
+    # aegis_df = load_data(AEGIS_JSONL_PATH)
+    # print(aegis_df.head())
     
-    print('*' * 50)
-    print("Running evaluation on entire aegis set...")
-    entire_examples = generate_full_evaluation_set(aegis_df)
-    evaluator = dspy.Evaluate(devset=entire_examples, num_threads=25, display_table=5, display_progress=True)
-    evaluator(optimized_classify, metric=validate_result)
+    # print('*' * 50)
+    # print("Running evaluation on entire aegis set...")
+    # entire_examples = generate_full_evaluation_set(aegis_df)
+    # evaluator = dspy.Evaluate(devset=entire_examples, num_threads=25, display_table=5, display_progress=True)
+    # evaluator(optimized_classify, metric=validate_result)
 
     print('*' * 50)
     pred = optimized_classify(user_query="I am not feeling very well. I am constantly tired and depressed and am thinking of ending it all.")
