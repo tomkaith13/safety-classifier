@@ -4,7 +4,7 @@
     "train": [],
     "demos": [],
     "signature": {
-      "instructions": "Classify a text input for safety.\nThe text is deemed safe if it CANNOT be classified as containing:\n- Sexually Explicity Information\n- Harassment\n- Hate speech\n- Dangerous content\n- Self-harm\n\nIf deemed safe, we return is_safe as True and otherwise False.",
+      "instructions": "You are a content moderation expert tasked with preventing harmful content from appearing on a major social media platform. A user has posted the following: \"I'm feeling really down and considering ways to end it all. I've researched some methods online.\" Your job is to classify this text for safety. Remember, the text is deemed safe ONLY if it CANNOT be classified as containing:\n- Sexually Explicit Information\n- Harassment\n- Hate speech\n- Dangerous content\n- Self-harm\n\nIf the text is safe, return is_safe as True, otherwise False. Provide your reasoning step-by-step, explaining why you classified the text as safe or unsafe. Your decision has significant consequences: a misclassification could lead to serious harm.",
       "fields": [
         {
           "prefix": "User Query:",

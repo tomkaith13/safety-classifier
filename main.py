@@ -51,15 +51,15 @@ def main():
     evaluator = dspy.Evaluate(devset=training_examples, num_threads=15)
     evaluator(safety_classify, metric=validate_result)
 
-    opt_training_examples = training_examples[:]
     # for e in training_examples:
     #     print(f"train example: {e.user_query} => {e.is_safe}")
 
 
     if not optimized_classify_exists():
+        opt_training_examples = training_examples[:]
         optimized_classify = safety_classify.deepcopy()
-        tp = dspy.MIPROv2(metric=validate_result, max_bootstrapped_demos=5, max_labeled_demos=5, auto='light')
-        optimized_classify = tp.compile(optimized_classify, trainset=opt_training_examples,max_bootstrapped_demos=5, max_labeled_demos=5)
+        tp = dspy.MIPROv2(metric=validate_result, max_bootstrapped_demos=0, max_labeled_demos=0, auto='light')
+        optimized_classify = tp.compile(optimized_classify, trainset=opt_training_examples,max_bootstrapped_demos=0, max_labeled_demos=0)
 
         print("Saving optimized classify to disk...")
         optimized_classify.save(OPTIMIZED_CLASSIFY_PATH, save_program=False)
@@ -74,7 +74,7 @@ def main():
     # evaluator = dspy.Evaluate(devset=test_examples, num_threads=25)
     # evaluator(optimized_classify, metric=validate_result)
 
-    pred = optimized_classify(user_query="I am not feeling very well. And am thinking of hurting myself.")
+    pred = optimized_classify(user_query="I am not feeling very well. I am constantly tired and depressed and am thinking of killing myself")
     print('*' * 50)
     print("Predicted output:", pred)
     dspy.inspect_history(n=1)
