@@ -1,8 +1,13 @@
-
 import dspy
 from dotenv import load_dotenv
 import os
-from examples.utils import load_data, create_training_and_test_examples, validate_result, generate_full_evaluation_set, transform_aegis_json_to_jsonl
+from examples.utils import (
+    load_data,
+    create_training_and_test_examples,
+    validate_result,
+    generate_full_evaluation_set,
+    transform_aegis_json_to_jsonl,
+)
 from modules.safety_classifier import safety_classify
 
 EXAMPLES_PATH = "./examples/data.csv"
@@ -14,17 +19,31 @@ def optimized_classify_exists():
     """Check if the optimized classify file exists."""
     return os.path.exists(OPTIMIZED_CLASSIFY_PATH)
 
+
 load_dotenv()
 
+# ####### NOTE: use this if you are using Gemini models via VertexAI
+# lm = dspy.LM(
+#     "vertex_ai/gemini-2.0-flash-lite",
+#     vertex_project=os.getenv("PROJECT_ID"),
+#     vertex_location=os.getenv("LOCATION"),
+#     temperature=0.1,
+#     max_output_tokens=500,
+#     max_tokens=10000,
+#     cache=True,
+# )
+
+# Ollama based lm
+# lm = dspy.LM("ollama_chat/llama3.2:latest", api_base="http://localhost:11434", api_key="")
+
+# Gemini API based LM
 lm = dspy.LM(
-    "vertex_ai/gemini-2.0-flash-lite",
-    vertex_project=os.getenv("PROJECT_ID"),
-    vertex_location=os.getenv("LOCATION"),
-    temperature=0.1, 
-    max_output_tokens=500,
-    max_tokens=10000,
-    cache=True,
+    "gemini/gemini-2.0-flash",
+    api_key=os.getenv("GEMINI_KEY", ""),
+    temperature=0.1,
+    max_tokens=3000,
 )
+
 dspy.configure(lm=lm, track_usage=True, async_max_workers=8)
 
 
@@ -43,21 +62,30 @@ def main():
     pred = safety_classify(user_query=example.user_query)
 
     if not optimized_classify_exists():
-        print('*' * 50)
+        print("*" * 50)
         print("Running evaluation on training set...")
         evaluator = dspy.Evaluate(devset=training_examples, num_threads=15)
         evaluator(safety_classify, metric=validate_result)
 
         opt_training_examples = training_examples[:]
         optimized_classify = safety_classify.deepcopy()
-        tp = dspy.MIPROv2(metric=validate_result, max_bootstrapped_demos=0, max_labeled_demos=0, auto='medium')
-        optimized_classify = tp.compile(optimized_classify, trainset=opt_training_examples,
-                                        max_bootstrapped_demos=0, max_labeled_demos=0)
+        tp = dspy.MIPROv2(
+            metric=validate_result,
+            max_bootstrapped_demos=0,
+            max_labeled_demos=0,
+            auto="light",
+        )
+        optimized_classify = tp.compile(
+            optimized_classify,
+            trainset=opt_training_examples,
+            max_bootstrapped_demos=0,
+            max_labeled_demos=0,
+        )
 
         print("Saving optimized classify to disk...")
         optimized_classify.save(OPTIMIZED_CLASSIFY_PATH, save_program=False)
 
-        print('*' * 50)
+        print("*" * 50)
         print("Running evaluation on test set...")
         evaluator = dspy.Evaluate(devset=test_examples, num_threads=25)
         evaluator(optimized_classify, metric=validate_result)
@@ -66,28 +94,34 @@ def main():
         optimized_classify = safety_classify.deepcopy()
         optimized_classify.load(OPTIMIZED_CLASSIFY_PATH)
 
-
-
-
-    # transform files from [Aegis training](https://huggingface.co/datasets/nvidia/Aegis-AI-Content-Safety-Dataset-2.0/blob/main/train.json) to json 
+    # transform files from [Aegis training](https://huggingface.co/datasets/nvidia/Aegis-AI-Content-Safety-Dataset-2.0/blob/main/train.json) to json
     # after cleaning all REDACTED entries.
     # transform_aegis_json_to_jsonl(AEGIS_PATH)
 
     # aegis_df = load_data(AEGIS_JSONL_PATH)
     # print(aegis_df.head())
-    
+
     # print('*' * 50)
     # print("Running evaluation on entire aegis set...")
-    # entire_examples = generate_full_evaluation_set(aegis_df)
+    # entire_examples = generate_full_evaluation_set(aegis_df[:10])
     # evaluator = dspy.Evaluate(devset=entire_examples, num_threads=25, display_table=5, display_progress=True)
     # evaluator(optimized_classify, metric=validate_result)
 
-    print('*' * 50)
-    pred = optimized_classify(user_query="I am feeling very anxious all the time that I wonder if I will feel anything if I end it all.")
+    print("len of test_examples:", len(test_examples))
+    test_examples = test_examples[:5]
+
+    print("*" * 50)
+    print("Running evaluation on test set...")
+    evaluator = dspy.Evaluate(
+        devset=test_examples, num_threads=25, display_progress=True
+    )
+    evaluator(optimized_classify, metric=validate_result)
+
+    print("*" * 50)
+    pred = optimized_classify(user_query="I am really angry and this sucks!!")
     print("Predicted output:", pred)
     dspy.inspect_history(n=1)
-    print('*' * 50)
-
+    print("*" * 50)
 
 
 if __name__ == "__main__":
