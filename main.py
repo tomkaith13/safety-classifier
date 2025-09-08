@@ -34,15 +34,15 @@ load_dotenv()
 # )
 
 # Ollama based lm
-# lm = dspy.LM("ollama_chat/llama3.2:latest", api_base="http://localhost:11434", api_key="")
+lm = dspy.LM("ollama_chat/gemma3:4b", api_base="http://localhost:11434", api_key="")
 
 # Gemini API based LM
-lm = dspy.LM(
-    "gemini/gemini-2.0-flash",
-    api_key=os.getenv("GEMINI_KEY", ""),
-    temperature=0.1,
-    max_tokens=3000,
-)
+# lm = dspy.LM(
+#     "gemini/gemini-2.0-flash-lite",
+#     api_key=os.getenv("GEMINI_KEY", ""),
+#     temperature=0.1,
+#     max_tokens=3000,
+# )
 
 dspy.configure(lm=lm, track_usage=True, async_max_workers=8)
 
@@ -62,12 +62,12 @@ def main():
     pred = safety_classify(user_query=example.user_query)
 
     if not optimized_classify_exists():
-        print("*" * 50)
-        print("Running evaluation on training set...")
-        evaluator = dspy.Evaluate(devset=training_examples, num_threads=15)
-        evaluator(safety_classify, metric=validate_result)
+        # print("*" * 50)
+        # print("Running evaluation on training set...")
+        # evaluator = dspy.Evaluate(devset=training_examples, num_threads=15)
+        # evaluator(safety_classify, metric=validate_result)
 
-        opt_training_examples = training_examples[:]
+        opt_training_examples = training_examples[:1000]
         optimized_classify = safety_classify.deepcopy()
         tp = dspy.MIPROv2(
             metric=validate_result,
@@ -85,10 +85,10 @@ def main():
         print("Saving optimized classify to disk...")
         optimized_classify.save(OPTIMIZED_CLASSIFY_PATH, save_program=False)
 
-        print("*" * 50)
-        print("Running evaluation on test set...")
-        evaluator = dspy.Evaluate(devset=test_examples, num_threads=25)
-        evaluator(optimized_classify, metric=validate_result)
+        # print("*" * 50)
+        # print("Running evaluation on test set...")
+        # evaluator = dspy.Evaluate(devset=test_examples, num_threads=25)
+        # evaluator(optimized_classify, metric=validate_result)
     else:
         print("Loading optimized classify from disk...")
         optimized_classify = safety_classify.deepcopy()
@@ -98,27 +98,27 @@ def main():
     # after cleaning all REDACTED entries.
     # transform_aegis_json_to_jsonl(AEGIS_PATH)
 
-    # aegis_df = load_data(AEGIS_JSONL_PATH)
+    aegis_df = load_data(AEGIS_JSONL_PATH)
     # print(aegis_df.head())
 
-    # print('*' * 50)
-    # print("Running evaluation on entire aegis set...")
-    # entire_examples = generate_full_evaluation_set(aegis_df[:10])
-    # evaluator = dspy.Evaluate(devset=entire_examples, num_threads=25, display_table=5, display_progress=True)
-    # evaluator(optimized_classify, metric=validate_result)
-
-    print("len of test_examples:", len(test_examples))
-    test_examples = test_examples[:5]
-
-    print("*" * 50)
-    print("Running evaluation on test set...")
-    evaluator = dspy.Evaluate(
-        devset=test_examples, num_threads=25, display_progress=True
-    )
+    print('*' * 50)
+    print("Running evaluation on entire aegis set...")
+    entire_examples = generate_full_evaluation_set(aegis_df[:100])
+    evaluator = dspy.Evaluate(devset=entire_examples, num_threads=25, display_table=5, display_progress=True)
     evaluator(optimized_classify, metric=validate_result)
 
+    # print("len of test_examples:", len(test_examples))
+    # test_examples = test_examples[:500]
+
+    # print("*" * 50)
+    # print("Running evaluation on test set...")
+    # evaluator = dspy.Evaluate(
+    #     devset=test_examples, num_threads=25, display_progress=True
+    # )
+    # evaluator(optimized_classify, metric=validate_result)
+
     print("*" * 50)
-    pred = optimized_classify(user_query="I am really angry and this sucks!!")
+    pred = optimized_classify(user_query="I wonder if cutting with sharp objects would make me feel anything since I am so numb")
     print("Predicted output:", pred)
     dspy.inspect_history(n=1)
     print("*" * 50)
