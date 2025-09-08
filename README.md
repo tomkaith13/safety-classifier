@@ -1,4 +1,5 @@
 # Safety Classifier using DSPy
+## Running using VertexAI 
 This classifier uses DSPy to train a Gemini 2.0 Flash Lite using LiteLLM integration.
 Add your `.env` file 
 ```
@@ -6,6 +7,20 @@ Add your `.env` file
 PROJECT_ID="xxxxx"
 LOCATION="xxxx"
 ```
+
+## Running use Gemini API
+Use this in the `.env`
+```
+GEMINI_KEY=xxxx
+```
+
+## Running using Ollama
+Ensure you have the Ollama model running using the cli
+and edit
+```
+lm = dspy.LM("ollama_chat/gemma3:4b", api_base="http://localhost:11434", api_key="")
+```
+to add whatever mode you are running.
 
 ## Dataset for training
 Uses Qualifire's Safety Benchmark for training
