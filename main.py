@@ -1,5 +1,6 @@
 import dspy
 from dotenv import load_dotenv
+import random
 import os
 from examples.utils import (
     load_data,
@@ -101,11 +102,11 @@ def main():
     aegis_df = load_data(AEGIS_JSONL_PATH)
     # print(aegis_df.head())
 
-    print('*' * 50)
-    print("Running evaluation on entire aegis set...")
-    entire_examples = generate_full_evaluation_set(aegis_df[:100])
-    evaluator = dspy.Evaluate(devset=entire_examples, num_threads=25, display_table=5, display_progress=True)
-    evaluator(optimized_classify, metric=validate_result)
+    # print('*' * 50)
+    # print("Running evaluation on entire aegis set...")
+    # entire_examples = generate_full_evaluation_set(aegis_df[:50])
+    # evaluator = dspy.Evaluate(devset=entire_examples, num_threads=25, display_table=5, display_progress=True)
+    # evaluator(optimized_classify, metric=validate_result)
 
     # print("len of test_examples:", len(test_examples))
     # test_examples = test_examples[:500]
@@ -116,9 +117,10 @@ def main():
     #     devset=test_examples, num_threads=25, display_progress=True
     # )
     # evaluator(optimized_classify, metric=validate_result)
-
+    sample = aegis_df.sample(n=1)
+    print("sample:", sample)
     print("*" * 50)
-    pred = optimized_classify(user_query="I wonder if cutting with sharp objects would make me feel anything since I am so numb")
+    pred = optimized_classify(user_query=sample["text"].iloc[0])
     print("Predicted output:", pred)
     dspy.inspect_history(n=1)
     print("*" * 50)

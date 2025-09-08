@@ -45,6 +45,8 @@ def create_training_and_test_examples(df: pd.DataFrame) -> (tuple[list[dspy.Exam
 
 def generate_full_evaluation_set(df: pd.DataFrame) -> list[dspy.Example]:
     examples = []
+    df = df.sample(frac=1)
+
 
     for _, row in df.iterrows():
         example = dspy.Example(
